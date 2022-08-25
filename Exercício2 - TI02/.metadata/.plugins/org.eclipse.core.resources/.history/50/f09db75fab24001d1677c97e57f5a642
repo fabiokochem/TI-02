@@ -1,0 +1,123 @@
+package app;
+
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+
+import dao.UsuarioDAO;
+import model.Usuario;
+
+public class Principal {
+	private static UsuarioDAO usuarioDAO = new UsuarioDAO();
+	
+	public static void main(String[] args) throws Exception {
+		Scanner sc = new Scanner(System.in);
+		
+		int operador = 0;
+		do {
+			
+			System.out.println("Escolha uma opção: \n 1.Listar\n 2.Atualizar\n 3.Excluir\n 4.Inserir\n 5.Sair\n");
+			operador = Integer.parseInt(sc.nextLine());
+			
+			switch(operador) {
+				case 1:
+					Listar();
+					break;
+					
+				case 2:
+					if(Atualizar(sc)) {
+						System.out.println("O usuário foi atualizado");
+					}else {
+						System.out.println("ERRO: O usuário não foi atualizado");
+					}
+					break;
+				
+				case 3:
+					if(Excluir(sc)) {
+						System.out.println("O usuário foi excluído");
+					}else {
+						System.out.println("ERRO: O usuário não foi excluído");
+					}
+					break;
+					
+				case 4:
+					if(Inserir(sc)) {
+						System.out.println("O usuário foi inserido");
+					}else { 
+						System.out.println("ERRO: O usuário não foi inserido");
+					}
+					break;
+					
+				case 5:
+					usuarioDAO.close();
+					break;
+			}
+			
+		} while(operador != 5);
+		sc.close();
+		
+	}
+	
+	public static void Listar() {
+		List<Usuario> l = usuarioDAO.get("codigo");
+		for(Usuario user : l) {
+			System.out.println(user.toString());
+		}
+	}
+	
+	public static boolean Atualizar(Scanner sc){
+		String login = "",senha = "";char sexo = '\0';int codigo;
+
+			System.out.println("Especificações");
+			System.out.print("Código: ");
+			codigo = Integer.parseInt(sc.nextLine());
+			System.out.println();
+			
+			System.out.print("Login: ");
+			login = sc.nextLine();
+			System.out.println();
+
+			System.out.print("Senha: ");
+			senha = sc.nextLine();
+			System.out.println();
+
+			System.out.print("Sexo: ");
+			sexo = sc.nextLine().toUpperCase().charAt(0);
+			System.out.println();
+			boolean resp = usuarioDAO.update(new Usuario(codigo, login, senha, sexo));
+			return resp;
+	}
+	
+	public static boolean Excluir(Scanner sc) {
+		System.out.print("Código do usuário a ser excluído: ");
+		int operador = Integer.parseInt(sc.nextLine());
+		boolean resp = usuarioDAO.delete(operador);
+		return resp;
+	}
+	
+	public static boolean Inserir(Scanner sc) throws Exception {
+			int codigo = new Random().nextInt();String login = "";char sexo = '\0'; String senha = "";
+
+			System.out.println("Especificações: ");
+			/*System.out.print("Código: ");
+			codigo = Integer.parseInt(sc.nextLine());
+			System.out.println();*/
+			
+			System.out.print("Login: ");
+			login = sc.nextLine();
+			System.out.println();
+
+			System.out.print("Senha: ");
+			senha = sc.nextLine();
+			System.out.println();
+
+			System.out.print("Sexo: ");
+			sexo = sc.nextLine().toUpperCase().charAt(0);
+			System.out.println();
+			
+			Usuario user = new Usuario(codigo, login, senha, sexo);
+			boolean resp = usuarioDAO.insert(user);
+			return resp;
+	}
+	
+}
